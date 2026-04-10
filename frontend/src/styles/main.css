@@ -16,13 +16,24 @@
   
   --color-on-primary: #ffeff1;
   --color-on-secondary: #e3f6ff;
-  --color-on-secondary-container: #001f29;
+  --color-on-secondary-container: #005267;
   --color-on-surface: #302e2b;
   --color-on-surface-variant: #5d5b58;
 
+  --color-background: #fbf6f1;
+  --color-surface-dim: #d8d4cd;
+  --color-surface-bright: #fbf6f1;
+  --color-surface-variant: #e1dcd6;
+  --color-outline-variant: #b0aca8;
+  --color-tertiary-fixed: #ffd709;
+  --color-error: #b41340;
+  --color-surface-container-high: #e6e2dc;
+
   --font-display: "Poppins", "Plus Jakarta Sans", ui-sans-serif, system-ui;
+  --font-headline: "Plus Jakarta Sans", "Poppins", ui-sans-serif, system-ui;
   --font-body: "Inter", ui-sans-serif, system-ui;
   --font-label: "Be Vietnam Pro", ui-sans-serif, system-ui;
+
 
   --radius-xl: 32px;
   --radius-lg: 24px;
@@ -47,10 +58,17 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-display);
+    font-family: var(--font-headline);
     margin: 0;
   }
+
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    display: inline-block;
+    vertical-align: middle;
+  }
 }
+
 
 @layer components {
   /* No-Line Components */

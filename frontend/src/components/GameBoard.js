@@ -10,14 +10,16 @@ import { triggerHaptic } from '../utils/haptics';
  */
 
 export class GameBoard {
-  constructor(container, gameState) {
+  constructor(container, gameState, onHome) {
     this.container = container;
     this.state = gameState;
+    this.onHome = onHome;
     this.bounds = { width: 0, height: 0 };
     this.hearts = [];
     this.bucket = null;
     this.isPaused = false;
     this.lastSpawnTime = 0;
+    this.missCount = 0;
     
     this.init();
   }
@@ -137,7 +139,19 @@ export class GameBoard {
         return false;
       }
       
-      if (!heart.isActive) return false;
+      if (!heart.isActive) {
+        // Only count as a "miss" if it's a positive heart (Normal or Golden)
+        if (heart.type.score > 0) {
+          this.missCount++;
+          if (this.missCount > 2) {
+            this.state.lives--;
+            this.missCount = 0;
+            triggerHaptic('heavy');
+            this.updateHUD();
+          }
+        }
+        return false;
+      }
       return true;
     });
   }
@@ -198,7 +212,13 @@ export class GameBoard {
     if (scoreElem) scoreElem.textContent = this.state.score;
     
     const livesElem = document.querySelector('#lives-display');
-    if (livesElem) livesElem.innerHTML = '❤️'.repeat(Math.max(0, this.state.lives));
+    if (livesElem) {
+      livesElem.innerHTML = '❤️'.repeat(Math.max(0, this.state.lives));
+      // Visual indicator for misses
+      if (this.missCount > 0) {
+        livesElem.innerHTML += `<span class="text-on-surface-variant/30 ml-2 text-sm font-label uppercase">Miss: ${this.missCount}/3</span>`;
+      }
+    }
     
     const progress = (this.state.score % 100);
     const bar = document.querySelector('#progress-bar');
@@ -217,13 +237,15 @@ export class GameBoard {
     const text = msgList[Math.floor(Math.random() * msgList.length)];
     const popup = document.createElement('div');
     
-    popup.className = 'absolute font-display font-bold text-lg pointer-events-none animate-popup-rise';
+    popup.className = 'absolute font-display font-bold text-lg pointer-events-none animate-popup-rise z-50 shadow-sm';
     popup.style.left = `${heart.x}px`;
     popup.style.top = `${heart.y}px`;
+
     popup.style.color = heart.type.type === 'GOLDEN' ? 'var(--color-tertiary)' : 'var(--color-primary)';
     popup.textContent = text;
     
-    document.querySelector('#message-container').appendChild(popup);
+    // Append to play-area instead of message-container for correct absolute positioning
+    document.querySelector('#play-area').appendChild(popup);
     
     setTimeout(() => {
       if (popup.parentNode) popup.parentNode.removeChild(popup);
@@ -232,14 +254,30 @@ export class GameBoard {
 
   gameOver() {
     this.isPaused = true;
-    new GameOver(this.container, this.state.score, () => {
-      this.state.score = 0;
-      this.state.lives = 3;
-      this.state.level = 1;
-      this.hearts = [];
-      this.lastSpawnTime = 0;
-      this.isPaused = false;
-      this.init();
-    });
+    new GameOver(
+      this.container, 
+      this.state.score, 
+      () => {
+        // Reset State for Restart
+        this.resetInternalState();
+        this.init();
+      },
+      () => {
+        // Clean up and go Home
+        this.resetInternalState();
+        if (this.onHome) this.onHome();
+      }
+    );
   }
+
+  resetInternalState() {
+    this.state.score = 0;
+    this.state.lives = 6;
+    this.state.level = 1;
+    this.missCount = 0;
+    this.hearts = [];
+    this.lastSpawnTime = 0;
+    this.isPaused = false;
+  }
+
 }

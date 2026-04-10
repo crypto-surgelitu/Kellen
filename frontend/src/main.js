@@ -13,7 +13,7 @@ class Game {
       view: 'start', // start, playing, gameover
       score: 0,
       level: 1,
-      lives: 3,
+      lives: 6,
       config: null,
     };
 
@@ -88,8 +88,13 @@ class Game {
   }
 
   renderGameBoard() {
-    this.gameBoard = new GameBoard(this.app, this.state);
+    this.gameBoard = new GameBoard(this.app, this.state, () => this.goToHome());
     this.gameBoard.start();
+  }
+
+  goToHome() {
+    this.state.view = 'start';
+    this.render();
   }
 }
 
