@@ -54,59 +54,57 @@ export class GameOver {
         </div>
 
         <!-- Main Card -->
-        <div class="relative z-10 w-full max-w-md bg-white/80 backdrop-blur-xl p-8 rounded-xl shadow-[0_40px_40px_rgba(168,39,90,0.06)] border border-outline-variant/15 flex flex-col items-center text-center animate-soft-spring">
+        <div class="relative z-10 w-[92%] max-w-md bg-white/80 backdrop-blur-xl p-5 sm:p-8 rounded-xl shadow-[0_40px_40px_rgba(168,39,90,0.06)] border border-outline-variant/15 flex flex-col items-center text-center animate-soft-spring max-h-[92vh] overflow-y-auto">
           
           <!-- Icon Header -->
-          <div class="mb-6 relative">
-            <div class="w-24 h-24 bg-primary-container rounded-full flex items-center justify-center shadow-[0_12px_40px_rgba(168,39,90,0.2)]">
-              <span class="material-symbols-outlined text-on-primary-container text-5xl" style="font-variation-settings: 'FILL' 1;">heart_broken</span>
+          <div class="mb-4 sm:mb-6 relative shrink-0">
+            <div class="w-20 h-20 sm:w-24 sm:h-24 bg-primary-container rounded-full flex items-center justify-center shadow-[0_12px_40px_rgba(168,39,90,0.2)]">
+              <span class="material-symbols-outlined text-on-primary-container text-4xl sm:text-5xl" style="font-variation-settings: 'FILL' 1;">heart_broken</span>
             </div>
-            <div class="absolute -top-2 -right-2 w-10 h-10 bg-tertiary-container rounded-full flex items-center justify-center border-4 border-white shadow-md">
-              <span class="material-symbols-outlined text-on-tertiary-container text-xl" style="font-variation-settings: 'FILL' 1;">star</span>
+            <div class="absolute -top-1 -right-1 w-8 h-8 sm:w-10 sm:h-10 bg-tertiary-container rounded-full flex items-center justify-center border-2 sm:border-4 border-white shadow-md">
+              <span class="material-symbols-outlined text-on-tertiary-container text-base sm:text-xl" style="font-variation-settings: 'FILL' 1;">star</span>
             </div>
           </div>
 
-          <h1 class="font-headline font-extrabold text-4xl text-primary tracking-tight mb-2 uppercase">
+          <h1 class="font-headline font-extrabold text-2xl sm:text-4xl text-primary tracking-tight mb-1 sm:mb-2 uppercase">
             Game Over
           </h1>
-          <p class="font-label text-on-surface-variant text-lg mb-8">
+          <p class="font-label text-on-surface-variant text-base sm:text-lg mb-6 sm:mb-8">
             ${phrase}
           </p>
 
           <!-- Score Section -->
-          <div class="w-full bg-surface-container-low rounded-lg p-6 mb-10 relative overflow-hidden group">
+          <div class="w-full bg-surface-container-low rounded-lg p-4 sm:p-6 mb-6 sm:mb-10 relative overflow-hidden group">
             <div class="relative z-10">
-              <p class="font-label text-on-surface-variant uppercase tracking-widest text-xs font-bold mb-1">Final Score</p>
-              <div class="font-headline text-6xl font-black text-primary flex items-center justify-center gap-2">
+              <p class="font-label text-on-surface-variant uppercase tracking-widest text-[10px] sm:text-xs font-bold mb-1">Final Score</p>
+              <div class="font-headline text-5xl sm:text-6xl font-black text-primary flex items-center justify-center gap-2">
                 ${this.score}
-                <span class="material-symbols-outlined text-tertiary-fixed text-4xl" style="font-variation-settings: 'FILL' 1;">favorite</span>
+                <span class="material-symbols-outlined text-tertiary-fixed text-3xl sm:text-4xl" style="font-variation-settings: 'FILL' 1;">favorite</span>
               </div>
-            </div>
-            <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-              <span class="material-symbols-outlined text-8xl">favorite</span>
             </div>
           </div>
 
           <!-- Buttons -->
-          <div class="flex flex-col w-full gap-4">
-            <button id="retry-btn" class="w-full py-4 px-8 rounded-full bg-gradient-to-r from-primary to-primary-container text-on-primary font-headline font-bold text-lg shadow-[0_8px_20px_rgba(168,39,90,0.3)] hover:scale-105 active:scale-95 transition-all duration-400 flex items-center justify-center gap-2">
-              <span class="material-symbols-outlined">replay</span>
+          <div class="flex flex-col w-full gap-3 sm:gap-4">
+            <button id="retry-btn" class="w-full py-3 sm:py-4 px-8 rounded-full bg-gradient-to-r from-primary to-primary-container text-on-primary font-headline font-bold text-base sm:text-lg shadow-[0_8px_20px_rgba(168,39,90,0.3)] hover:scale-105 active:scale-95 transition-all duration-400 flex items-center justify-center gap-2">
+              <span class="material-symbols-outlined text-xl">replay</span>
               Retry
             </button>
-            <div class="grid grid-cols-2 gap-4">
-              <button id="home-btn" class="w-full py-4 px-4 rounded-full bg-secondary-container text-on-secondary-container font-headline font-bold text-sm hover:scale-105 active:scale-95 transition-all duration-400 flex items-center justify-center gap-2">
+            <div class="grid grid-cols-2 gap-3 sm:gap-4">
+              <button id="home-btn" class="w-full py-3 sm:py-4 px-2 rounded-full bg-secondary-container text-on-secondary-container font-headline font-bold text-xs sm:text-sm hover:scale-105 active:scale-95 transition-all duration-400 flex items-center justify-center gap-2">
                 <span class="material-symbols-outlined text-lg">home</span>
                 Home
               </button>
-              <button id="leaderboard-btn" class="w-full py-4 px-4 rounded-full bg-surface-container-high text-on-surface font-headline font-bold text-sm hover:scale-105 active:scale-95 transition-all duration-400 flex items-center justify-center gap-2">
+              <button id="leaderboard-btn" class="w-full py-3 sm:py-4 px-2 rounded-full bg-surface-container-high text-on-surface font-headline font-bold text-xs sm:text-sm hover:scale-105 active:scale-95 transition-all duration-400 flex items-center justify-center gap-2">
                 <span class="material-symbols-outlined text-lg">leaderboard</span>
                 Ranks
               </button>
             </div>
           </div>
 
-          <!-- Quick Stats Row (Placeholder for Supabase Sync) -->
-          <div class="mt-8 flex gap-6">
+          <!-- Quick Stats Row -->
+          <div class="mt-6 sm:mt-8 flex gap-4 sm:gap-6">
+
             <div class="flex flex-col items-center">
               <span class="font-headline font-bold text-on-surface">12</span>
               <span class="font-label text-on-surface-variant text-[10px] uppercase">Level</span>
