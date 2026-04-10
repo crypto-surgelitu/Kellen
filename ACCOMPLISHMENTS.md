@@ -18,6 +18,24 @@
 - ✅ Updated `main.js` to support view switching and transition animations.
 - ✅ Refined Tailwind v4 theme with missing surface tokens and specific border radii.
 
+## Phase 3: Falling Hearts Mechanic & Collision Detection (COMPLETED)
+- ✅ Defined game-wide constants for heart types, scores, and physics in `src/utils/constants.js`.
+- ✅ Implemented `FallingHeart` entity with movement logic and automatic cleanup.
+- ✅ Integrated a `requestAnimationFrame` game loop into the `GameBoard`.
+- ✅ Developed random spawning logic with weighted probabilities for Normal, Golden, and Heartbreak souls.
+- ✅ Established a `checkCollision` utility for future bucket interaction.
+- ✅ Connected game state to the HUD (Score/Lives) for real-time visualization.
+
+## Phase 4: Bucket Movement & Input Handling (COMPLETED)
+- ✅ Developed the `Bucket` entity with a premium pill-shaped design and ambient glow.
+- ✅ Implemented unified Input Handling for both Mouse and Touch (Mobile) events.
+- ✅ Integrated real-time Collision Detection between the bucket and falling hearts.
+- ✅ Developed game state logic for catching hearts (Score addition, Life deduction for 💔).
+- ✅ Created a `triggerHaptic` utility to provide tactile feedback during gameplay.
+- ✅ Implemented basic Game Over logic and score display.
+
 ---
-*Next Step: Phase 3 - Falling Hearts Mechanic & Collision Detection.*
+*Next Step: Phase 5 - Score HUD & Real-time Update Logic (Polish).*
+
+
 
