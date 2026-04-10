@@ -1,4 +1,6 @@
 import './styles/main.css';
+import { GameBoard } from './components/GameBoard';
+import { setupResponsiveHandler } from './utils/responsive';
 
 /**
  * Catch My Love - Main Entry Point
@@ -22,12 +24,18 @@ class Game {
     console.log('Catch My Love initialized');
     await this.fetchConfig();
     this.render();
+    
+    // Set up responsive resize listener
+    setupResponsiveHandler((bounds) => {
+      if (this.gameBoard) {
+        this.gameBoard.updateBounds();
+        this.gameBoard.render(); // Re-render if necessary or just update positions
+      }
+    });
   }
 
   async fetchConfig() {
     try {
-      const apiBase = import.meta.env.VITE_API_BASE || 'http://localhost:3001';
-      // For now, using default config if API fails
       this.state.config = {
         heartSpeed: 2,
         spawnRate: 1000,
@@ -40,21 +48,47 @@ class Game {
   }
 
   render() {
+    if (this.state.view === 'start') {
+      this.renderStartScreen();
+    } else if (this.state.view === 'playing') {
+      this.renderGameBoard();
+    }
+  }
+
+  renderStartScreen() {
     this.app.innerHTML = `
-      <div class="flex flex-col items-center justify-center h-full text-center space-y-8 animate-soft-spring">
-        <h1 class="text-6xl font-bold text-primary">Catch My Love</h1>
-        <p class="text-xl text-on-surface-variant max-w-md px-4">
-          Prepare your heart! Catch all the love falling from the sky.
-        </p>
-        <button id="start-btn" class="btn-primary text-xl font-bold shadow-lg shadow-primary/20">
-          Start Playing
-        </button>
+      <div class="flex flex-col items-center justify-center h-full text-center p-6 space-y-12 animate-soft-spring">
+        <div class="space-y-4">
+          <h1 class="text-7xl font-display font-bold text-primary leading-tight">Catch<br/>My Love</h1>
+          <p class="text-xl font-body text-on-surface-variant max-w-xs mx-auto">
+            Spread your heart wide and catch the falling love.
+          </p>
+        </div>
+        
+        <div class="relative w-full max-w-xs">
+          <button id="start-btn" class="btn-primary w-full text-2xl font-bold py-6 shadow-2xl shadow-primary/30">
+            Start Playing
+          </button>
+          
+          <!-- Decorative hearts -->
+          <span class="absolute -top-4 -left-4 text-4xl animate-bounce" style="animation-delay: 0.2s">💖</span>
+          <span class="absolute -bottom-4 -right-4 text-4xl animate-bounce" style="animation-delay: 0.5s">💝</span>
+        </div>
+
+        <footer class="absolute bottom-10 w-full text-center">
+          <span class="text-sm font-label text-on-surface-variant/60">A Playful Premium Experience</span>
+        </footer>
       </div>
     `;
 
     document.querySelector('#start-btn').addEventListener('click', () => {
-      alert('Game starting soon! Phase 2 implementation coming.');
+      this.state.view = 'playing';
+      this.render();
     });
+  }
+
+  renderGameBoard() {
+    this.gameBoard = new GameBoard(this.app, this.state);
   }
 }
 
