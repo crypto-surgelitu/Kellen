@@ -89,6 +89,7 @@ class Game {
 
   renderGameBoard() {
     this.gameBoard = new GameBoard(this.app, this.state);
+    this.gameBoard.start();
   }
 }
 

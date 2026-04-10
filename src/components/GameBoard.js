@@ -25,6 +25,9 @@ export class GameBoard {
   init() {
     this.updateBounds();
     this.render();
+  }
+
+  start() {
     this.setupInput();
     this.startLoop();
   }
@@ -87,22 +90,26 @@ export class GameBoard {
   }
 
   setupInput() {
+    if (this.inputSetupDone) return;
+    
     const handleMove = (e) => {
       if (this.isPaused || !this.bucket) return;
       
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      // Center bucket on touch/mouse
       this.bucket.moveTo(clientX - this.bucket.width / 2);
     };
 
     window.addEventListener('mousemove', handleMove);
     window.addEventListener('touchmove', handleMove, { passive: false });
+    this.inputSetupDone = true;
   }
 
   startLoop() {
+    if (this.loopStarted) return;
+    this.loopStarted = true;
+    
     const loop = (time) => {
       if (this.isPaused) return;
-
       this.update(time);
       requestAnimationFrame(loop);
     };
@@ -112,8 +119,10 @@ export class GameBoard {
   update(time) {
     if (!this.lastSpawnTime) this.lastSpawnTime = time;
 
-    // Spawning logic
-    const currentInterval = Math.max(GAME_PHYSICS.SPAWN_INTERVAL - (this.state.level * 50), GAME_PHYSICS.MIN_SPAWN_INTERVAL);
+    // Spawning logic - Progressive difficulty
+    const difficultyReduction = Math.min((this.state.level - 1) * 150, 850);
+    const currentInterval = Math.max(GAME_PHYSICS.SPAWN_INTERVAL - difficultyReduction, 350);
+    
     if (time - this.lastSpawnTime > currentInterval) {
       this.spawnHeart();
       this.lastSpawnTime = time;
@@ -123,7 +132,6 @@ export class GameBoard {
     this.hearts = this.hearts.filter(heart => {
       heart.update();
       
-      // Check collision with bucket
       if (this.bucket && checkCollision(heart, this.bucket)) {
         this.handleCatch(heart);
         return false;
@@ -144,9 +152,9 @@ export class GameBoard {
       type = HEART_TYPES.HEARTBREAK;
     }
 
-    const margin = 50;
+    const margin = 20; // Reduced margin for better mobile play
     const x = Math.random() * (this.bounds.width - margin * 2) + margin;
-    const speed = GAME_PHYSICS.INITIAL_SPEED + (this.state.level * 0.5);
+    const speed = GAME_PHYSICS.INITIAL_SPEED + (this.state.level * 0.8);
 
     this.hearts.push(new FallingHeart(type, x, speed));
   }
@@ -163,19 +171,16 @@ export class GameBoard {
       triggerHaptic('light');
     }
 
-    // Visual feedback
-    this.updateHUD();
-    this.showAffectionPopup(heart);
-    
-    // Cleanup heart
-    heart.destroy();
-
-
-    // Check level up logic
-    if (this.state.score > this.state.level * 100) {
-      this.state.level++;
+    // Progression
+    const previousLevel = this.state.level;
+    this.state.level = Math.floor(this.state.score / 100) + 1;
+    if (this.state.level > previousLevel) {
       this.triggerLevelUpFlash();
     }
+
+    this.updateHUD();
+    this.showAffectionPopup(heart);
+    heart.destroy();
   }
 
   triggerLevelUpFlash() {
@@ -187,7 +192,6 @@ export class GameBoard {
       if (flash.parentNode) flash.parentNode.removeChild(flash);
     }, 1000);
   }
-
 
   updateHUD() {
     const scoreElem = document.querySelector('#score-display');
@@ -221,7 +225,6 @@ export class GameBoard {
     
     document.querySelector('#message-container').appendChild(popup);
     
-    // Cleanup popup
     setTimeout(() => {
       if (popup.parentNode) popup.parentNode.removeChild(popup);
     }, 1500);
@@ -230,11 +233,11 @@ export class GameBoard {
   gameOver() {
     this.isPaused = true;
     new GameOver(this.container, this.state.score, () => {
-      // Reset State
       this.state.score = 0;
       this.state.lives = 3;
       this.state.level = 1;
       this.hearts = [];
+      this.lastSpawnTime = 0;
       this.isPaused = false;
       this.init();
     });

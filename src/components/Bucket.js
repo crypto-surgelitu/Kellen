@@ -17,7 +17,7 @@ export class Bucket {
   create() {
     this.el = document.createElement('div');
     this.el.id = 'bucket';
-    this.el.className = 'absolute z-30 transition-all duration-75 ease-out';
+    this.el.className = 'absolute z-30';
     
     // Styled Pill Shape with Ambient Glow
     this.el.style.width = `${this.width}px`;
