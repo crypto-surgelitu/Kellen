@@ -35,3 +35,10 @@ export const GAME_PHYSICS = {
   SPAWN_INTERVAL: 1200, // ms
   MIN_SPAWN_INTERVAL: 400,
 };
+
+export const AFFECTION_MESSAGES = {
+  SWEET: ["Cutie!", "Babe!", "Sweetie!", "Winner!"],
+  AFFECTIONATE: ["I Love You!", "Stay Mine Forever", "Love You to the Moon!", "You're My Everything"],
+  FLIRTY: ["Looking Hot!", "Making Me Blush", "Simply Irresistible", "Caught Me! 😉"],
+};
+

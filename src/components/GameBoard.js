@@ -1,6 +1,7 @@
 import { FallingHeart } from './FallingHeart';
 import { Bucket } from './Bucket';
-import { HEART_TYPES, GAME_PHYSICS } from '../utils/constants';
+import { GameOver } from './GameOver';
+import { HEART_TYPES, GAME_PHYSICS, AFFECTION_MESSAGES } from '../utils/constants';
 import { checkCollision } from '../utils/collision';
 import { triggerHaptic } from '../utils/haptics';
 
@@ -164,16 +165,29 @@ export class GameBoard {
 
     // Visual feedback
     this.updateHUD();
+    this.showAffectionPopup(heart);
     
     // Cleanup heart
     heart.destroy();
 
+
     // Check level up logic
     if (this.state.score > this.state.level * 100) {
       this.state.level++;
-      console.log('Level Up!', this.state.level);
+      this.triggerLevelUpFlash();
     }
   }
+
+  triggerLevelUpFlash() {
+    const flash = document.createElement('div');
+    flash.className = 'fixed inset-0 z-[200] bg-white pointer-events-none animate-flash';
+    document.body.appendChild(flash);
+    
+    setTimeout(() => {
+      if (flash.parentNode) flash.parentNode.removeChild(flash);
+    }, 1000);
+  }
+
 
   updateHUD() {
     const scoreElem = document.querySelector('#score-display');
@@ -191,9 +205,38 @@ export class GameBoard {
     }
   }
 
+  showAffectionPopup(heart) {
+    let msgList = AFFECTION_MESSAGES.SWEET;
+    if (heart.type.type === 'GOLDEN') msgList = AFFECTION_MESSAGES.AFFECTIONATE;
+    if (this.state.score % 50 === 0) msgList = AFFECTION_MESSAGES.FLIRTY;
+
+    const text = msgList[Math.floor(Math.random() * msgList.length)];
+    const popup = document.createElement('div');
+    
+    popup.className = 'absolute font-display font-bold text-lg pointer-events-none animate-popup-rise';
+    popup.style.left = `${heart.x}px`;
+    popup.style.top = `${heart.y}px`;
+    popup.style.color = heart.type.type === 'GOLDEN' ? 'var(--color-tertiary)' : 'var(--color-primary)';
+    popup.textContent = text;
+    
+    document.querySelector('#message-container').appendChild(popup);
+    
+    // Cleanup popup
+    setTimeout(() => {
+      if (popup.parentNode) popup.parentNode.removeChild(popup);
+    }, 1500);
+  }
+
   gameOver() {
     this.isPaused = true;
-    alert('Game Over! Your score: ' + this.state.score);
-    window.location.reload(); // Simple reload for now
+    new GameOver(this.container, this.state.score, () => {
+      // Reset State
+      this.state.score = 0;
+      this.state.lives = 3;
+      this.state.level = 1;
+      this.hearts = [];
+      this.isPaused = false;
+      this.init();
+    });
   }
 }
