@@ -18,6 +18,12 @@ export class GameBoard {
     this.missCount = 0;
     this.combo = 1;
     this.showPopup = false;
+    this.showSettings = false;
+    this.settings = {
+      sound: true,
+      haptics: true,
+      darkMode: false
+    };
 
     this.init();
   }
@@ -39,17 +45,27 @@ export class GameBoard {
     };
   }
 
+  toggleDarkMode(enable) {
+    this.settings.darkMode = enable;
+    if (enable) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('darkMode', enable);
+  }
+
   render() {
     this.container.innerHTML = `
       <div class="fixed inset-0 z-0 vibrant-gradient-bg opacity-20"></div>
-      
+
       <header class="flex justify-between items-center w-full px-6 py-4 absolute z-50 bg-transparent">
-        <div class="text-2xl font-black text-[#a8275a] italic font-headline">Catch My Love</div>
+        <div class="text-2xl font-black text-primary italic font-headline">Catch My Love</div>
         <div class="flex gap-4">
-          <button id="favorites-btn" class="text-[#5d5b58] hover:opacity-80 transition-opacity scale-95 active:scale-90 transition-transform duration-400 ease-[cubic-bezier(0.34,1.56,0.64,1)]">
+          <button id="favorites-btn" class="text-on-surface-variant hover:opacity-80 transition-opacity scale-95 active:scale-90 transition-transform duration-400 ease-[cubic-bezier(0.34,1.56,0.64,1)]">
             <span class="material-symbols-outlined" data-icon="favorite">favorite</span>
           </button>
-          <button id="game-settings-btn" class="text-[#5d5b58] hover:opacity-80 transition-opacity scale-95 active:scale-90 transition-transform duration-400 ease-[cubic-bezier(0.34,1.56,0.64,1)]">
+          <button id="game-settings-btn" class="text-on-surface-variant hover:opacity-80 transition-opacity scale-95 active:scale-90 transition-transform duration-400 ease-[cubic-bezier(0.34,1.56,0.64,1)]">
             <span class="material-symbols-outlined" data-icon="settings">settings</span>
           </button>
         </div>
@@ -101,6 +117,7 @@ export class GameBoard {
       </main>
 
       ${this.showPopup ? this.renderPopup() : ''}
+      ${this.showSettings ? this.renderSettingsOverlay() : ''}
     `;
 
     const interactionLayer = document.querySelector('#interaction-layer');
@@ -111,8 +128,15 @@ export class GameBoard {
     });
 
     document.querySelector('#game-settings-btn')?.addEventListener('click', () => {
-      this.isPaused = !this.isPaused;
+      this.showSettings = true;
+      this.isPaused = true;
+      this.render();
+      this.setupSettingsListeners();
     });
+
+    if (this.showPopup) {
+      this.setupPopupListeners();
+    }
   }
 
   renderPopup() {
@@ -132,13 +156,76 @@ export class GameBoard {
             You just hit a 10-heart streak! Your rhythm is perfectly in sync with the beats. Keep going!
           </p>
           <div class="flex flex-col w-full gap-3">
-            <button id="continue-btn" class="w-full py-4 px-8 bg-gradient-to-r from-primary to-primary-container text-on-primary font-bold rounded-xl shadow-lg hover:opacity-90 active:scale-95 transition-all duration-400 ease-[cubic-bezier(0.34,1.56,0.64,1)]">
+            <button id="continue-btn" class="w-full py-4 px-8 bg-gradient-to-r from-primary to-primary-container text-white font-bold rounded-xl shadow-lg hover:opacity-90 active:scale-95 transition-all duration-400 ease-[cubic-bezier(0.34,1.56,0.64,1)]">
               Continue Playing
             </button>
             <button id="stats-btn" class="w-full py-3 px-8 text-primary font-medium hover:bg-surface-container-low rounded-xl transition-colors">
               View Stats
             </button>
           </div>
+        </div>
+      </div>
+    `;
+  }
+
+  renderSettingsOverlay() {
+    const soundEnabled = this.settings.sound;
+    const hapticsEnabled = this.settings.haptics;
+    const darkEnabled = this.settings.darkMode;
+
+    return `
+      <div class="absolute inset-0 z-[100] flex items-center justify-center p-6 bg-surface/60 backdrop-blur-sm">
+        <div class="max-w-sm w-full bg-surface-container-lowest rounded-xl shadow-[0_12px_40px_rgba(168,39,90,0.12)] p-6 relative overflow-hidden flex flex-col items-center text-center transform scale-100">
+          <div class="absolute top-0 right-0 p-4 opacity-10">
+            <span class="material-symbols-outlined text-6xl" data-icon="settings">settings</span>
+          </div>
+          
+          <h2 class="text-2xl font-black text-primary font-headline mb-6">Settings</h2>
+          
+          <div class="w-full space-y-4">
+            <div class="bg-surface-container-low p-4 rounded-lg flex items-center justify-between cursor-pointer" id="toggle-sound">
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-secondary text-2xl">volume_up</span>
+                <div class="text-left">
+                  <p class="font-headline font-bold text-on-surface">Sound Effects</p>
+                  <p class="font-label text-xs text-on-surface-variant">Game sounds</p>
+                </div>
+              </div>
+              <div class="w-12 h-6 ${soundEnabled ? 'bg-primary-container' : 'bg-surface-variant'} rounded-full relative transition-colors">
+                <div class="absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${soundEnabled ? 'right-1' : 'left-1'}"></div>
+              </div>
+            </div>
+
+            <div class="bg-surface-container-low p-4 rounded-lg flex items-center justify-between cursor-pointer" id="toggle-haptics">
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-secondary text-2xl">vibration</span>
+                <div class="text-left">
+                  <p class="font-headline font-bold text-on-surface">Haptics</p>
+                  <p class="font-label text-xs text-on-surface-variant">Vibration feedback</p>
+                </div>
+              </div>
+              <div class="w-12 h-6 ${hapticsEnabled ? 'bg-primary-container' : 'bg-surface-variant'} rounded-full relative transition-colors">
+                <div class="absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${hapticsEnabled ? 'right-1' : 'left-1'}"></div>
+              </div>
+            </div>
+
+            <div class="bg-surface-container-low p-4 rounded-lg flex items-center justify-between cursor-pointer" id="toggle-dark">
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-secondary text-2xl">dark_mode</span>
+                <div class="text-left">
+                  <p class="font-headline font-bold text-on-surface">Dark Mode</p>
+                  <p class="font-label text-xs text-on-surface-variant">Easier on eyes</p>
+                </div>
+              </div>
+              <div class="w-12 h-6 ${darkEnabled ? 'bg-primary-container' : 'bg-surface-variant'} rounded-full relative transition-colors">
+                <div class="absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${darkEnabled ? 'right-1' : 'left-1'}"></div>
+              </div>
+            </div>
+          </div>
+
+          <button id="close-settings" class="mt-6 w-full py-3 bg-primary text-white font-bold rounded-lg hover:opacity-90 transition-opacity">
+            Resume Game
+          </button>
         </div>
       </div>
     `;
@@ -247,6 +334,7 @@ export class GameBoard {
 
     if (this.combo === 10 && !this.showPopup) {
       this.showPopup = true;
+      this.isPaused = true;
       this.render();
       this.setupPopupListeners();
     } else {
@@ -266,6 +354,33 @@ export class GameBoard {
 
     document.querySelector('#stats-btn')?.addEventListener('click', () => {
       console.log('View stats');
+    });
+  }
+
+  setupSettingsListeners() {
+    document.querySelector('#toggle-sound')?.addEventListener('click', () => {
+      this.settings.sound = !this.settings.sound;
+      this.render();
+      this.setupSettingsListeners();
+    });
+
+    document.querySelector('#toggle-haptics')?.addEventListener('click', () => {
+      this.settings.haptics = !this.settings.haptics;
+      this.render();
+      this.setupSettingsListeners();
+    });
+
+    document.querySelector('#toggle-dark')?.addEventListener('click', () => {
+      this.settings.darkMode = !this.settings.darkMode;
+      this.toggleDarkMode(this.settings.darkMode);
+      this.render();
+      this.setupSettingsListeners();
+    });
+
+    document.querySelector('#close-settings')?.addEventListener('click', () => {
+      this.showSettings = false;
+      this.isPaused = false;
+      this.render();
     });
   }
 
@@ -343,5 +458,6 @@ export class GameBoard {
     this.isPaused = false;
     this.combo = 1;
     this.showPopup = false;
+    this.showSettings = false;
   }
 }

@@ -98,6 +98,23 @@
 # 🏆 Project Status: FULLY FEATURED
 All core features including landing dashboard, active gameplay, settings, and user-specific leaderboard are now fully integrated and functional.
 
+## Phase 15: Bug Fixes & In-Game Settings (COMPLETED)
+- ✅ **Retry Button Fix:** Fixed the retry button color by using inline `text-white` class instead of non-existent `text-on-primary`.
+- ✅ **Popup Pause Fix:** The achievement popup now properly pauses the game until the user clicks "Continue Playing".
+- ✅ **In-Game Settings Overlay:** Tapping the settings button during gameplay now pauses the game and shows an overlay with toggles.
+- ✅ **Dark Mode Toggle:** Added fully functional dark mode switch in the in-game settings overlay with proper theming.
+- ✅ **Dark Mode Persistence:** Dark mode preference is saved to localStorage and persists across sessions.
+
+## Phase 16: Dark Mode Full Support (COMPLETED)
+- ✅ **CSS Variables:** Added complete dark mode color palette in `main.css` using CSS variables.
+- ✅ **Component Updates:** Updated all glassmorphism, buttons, and backgrounds to support dark mode.
+- ✅ **Settings Integration:** Dark mode toggle now available in both start screen settings and in-game settings.
+- ✅ **Smooth Transitions:** Added proper color transitions for all elements when switching modes.
+
+## Phase 17: Constraints & Documentation (COMPLETED)
+- ✅ **CONSTRAINTS.md:** Created a constraints file to document development rules and restrictions.
+- ✅ **Development Guidelines:** Documented rules including: no UI overhauls, phase-based development, minimal code changes, build verification, and design system adherence.
+
 
 
 

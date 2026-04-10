@@ -86,10 +86,10 @@ export class GameOver {
 
           <!-- Buttons -->
           <div class="flex flex-col w-full gap-3 sm:gap-4">
-            <button id="retry-btn" class="w-full py-3 sm:py-4 px-8 rounded-full bg-gradient-to-r from-primary to-primary-container text-on-primary font-headline font-bold text-base sm:text-lg shadow-[0_8px_20px_rgba(168,39,90,0.3)] hover:scale-105 active:scale-95 transition-all duration-400 flex items-center justify-center gap-2">
-              <span class="material-symbols-outlined text-xl">replay</span>
-              Retry
-            </button>
+<button id="retry-btn" class="w-full py-3 sm:py-4 px-8 rounded-full bg-gradient-to-r from-primary to-primary-container text-white font-headline font-bold text-base sm:text-lg shadow-[0_8px_20px_rgba(168,39,90,0.3)] hover:scale-105 active:scale-95 transition-all duration-400 flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-xl">replay</span>
+          Retry
+        </button>
             <div class="grid grid-cols-2 gap-3 sm:gap-4">
               <button id="home-btn" class="w-full py-3 sm:py-4 px-2 rounded-full bg-secondary-container text-on-secondary-container font-headline font-bold text-xs sm:text-sm hover:scale-105 active:scale-95 transition-all duration-400 flex items-center justify-center gap-2">
                 <span class="material-symbols-outlined text-lg">home</span>
