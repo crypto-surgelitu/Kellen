@@ -115,6 +115,22 @@ All core features including landing dashboard, active gameplay, settings, and us
 - ✅ **CONSTRAINTS.md:** Created a constraints file to document development rules and restrictions.
 - ✅ **Development Guidelines:** Documented rules including: no UI overhauls, phase-based development, minimal code changes, build verification, and design system adherence.
 
+## Phase 18: Dark Mode Integration Fixes (COMPLETED)
+- ✅ **Start Screen Dark Mode Toggle:** Added working dark mode toggle in the start screen settings panel (replaced "Coming soon").
+- ✅ **Dark Mode Persistence:** Dark mode preference loads from localStorage on app initialization.
+- ✅ **Hardcoded Color Fixes:** Replaced hardcoded hex colors (`#a8275a`, `#5d5b58`) with CSS variable classes (`text-primary`, `text-on-surface-variant`) for proper dark mode support.
+- ✅ **Toggle Functionality:** Added sound and haptics toggle functionality in start screen settings.
+- ✅ **CSS Variables in HTML:** Added CSS variables at :root level in index.html for both light and dark modes.
+- ✅ **Body Inline Styles:** Added inline styles to body and app container that use CSS variables directly, ensuring dark mode colors apply immediately when toggled.
+
+## Phase 19: Sound Effects & Haptics Integration (COMPLETED)
+- ✅ **Audio Utility:** Created `src/utils/audio.js` with Web Audio API for game sound effects.
+- ✅ **Sound Types:** Implemented catch, miss, golden heart, heartbreak, level up, and game over sounds.
+- ✅ **Haptics Check:** Updated haptics to respect the haptics toggle setting (only vibrate when enabled).
+- ✅ **Sound Check:** Updated all game events to only play sounds when sound is enabled in settings.
+- ✅ **Settings Persistence:** Sound and haptics preferences now saved to and loaded from localStorage.
+- ✅ **Settings Sync:** In-game settings properly sync with the audio utility when toggles change.
+
 
 
 

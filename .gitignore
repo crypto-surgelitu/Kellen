@@ -1,0 +1,28 @@
+# AI Agent Tools
+.agents/
+.augment/
+.claude/
+.kilo/
+.windsurf/
+
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# Vite cache
+.vite/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Skills
+skills-lock.json

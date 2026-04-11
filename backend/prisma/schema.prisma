@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String
+  avatarUrl     String?
+  level         Int       @default(1)
+  totalHearts   Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  scores        Score[]
+  dailyRewards  DailyReward[]
+}
+
+model Score {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  value        Int
+  level        Int
+  comboMax     Int
+  heartsCaught Int
+  createdAt    DateTime @default(now())
+
+  @@index([value(sort: Desc)])
+}
+
+model DailyReward {
+  id        String   @id @default(cuid())
+  userId    String
+  date      DateTime @db.Date
+  reward    Int      @default(100)
+  claimed   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+}
+
+model GameConfig {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       Json
+  description String?
+  isActive    Boolean  @default(true)
+  updatedAt   DateTime @updatedAt
+}
+
+model AffectionMessage {
+  id        String   @id @default(cuid())
+  category  String
+  text      String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}

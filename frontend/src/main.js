@@ -2,10 +2,16 @@ import './styles/main.css';
 import { GameBoard } from './components/GameBoard';
 import { Leaderboard } from './components/Leaderboard';
 import { setupResponsiveHandler } from './utils/responsive';
+import { setSoundEnabled } from './utils/audio';
 
 class Game {
   constructor() {
     this.app = document.querySelector('#app');
+    this.settings = {
+      sound: true,
+      haptics: true,
+      darkMode: false
+    };
     this.state = {
       view: 'start',
       score: 0,
@@ -24,8 +30,36 @@ class Game {
     this.init();
   }
 
+  toggleDarkMode(enable) {
+    this.settings.darkMode = enable;
+    if (enable) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('darkMode', enable);
+  }
+
   async init() {
     console.log('Catch My Love initialized');
+    
+    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+    if (savedDarkMode) {
+      this.settings.darkMode = true;
+      document.documentElement.classList.add('dark');
+    }
+    
+    const savedSound = localStorage.getItem('sound');
+    if (savedSound !== null) {
+      this.settings.sound = savedSound === 'true';
+      setSoundEnabled(this.settings.sound);
+    }
+    
+    const savedHaptics = localStorage.getItem('haptics');
+    if (savedHaptics !== null) {
+      this.settings.haptics = savedHaptics === 'true';
+    }
+    
     await this.fetchConfig();
     this.render();
 
@@ -76,9 +110,9 @@ class Game {
       </div>
 
       <header class="flex justify-between items-center w-full px-6 py-4 absolute top-0 z-50">
-        <div class="text-2xl font-black text-[#a8275a] italic font-headline">Catch My Love</div>
+        <div class="text-2xl font-black text-primary italic font-headline">Catch My Love</div>
         <div class="flex gap-4">
-          <button id="settings-btn" class="material-symbols-outlined text-[#5d5b58] hover:opacity-80 transition-opacity p-2 bg-surface-container-low rounded-full">settings</button>
+          <button id="settings-btn" class="material-symbols-outlined text-on-surface-variant hover:opacity-80 transition-opacity p-2 bg-surface-container-low rounded-full">settings</button>
         </div>
       </header>
 
@@ -195,8 +229,8 @@ class Game {
       <div class="fixed inset-0 z-0 vibrant-gradient-bg opacity-20"></div>
       
       <header class="flex justify-between items-center w-full px-6 py-4 absolute top-0 z-50">
-        <button id="back-btn" class="material-symbols-outlined text-[#5d5b58] hover:opacity-80 transition-opacity p-2 bg-surface-container-low rounded-full">arrow_back</button>
-        <div class="text-2xl font-black text-[#a8275a] italic font-headline">Catch My Love</div>
+        <button id="back-btn" class="material-symbols-outlined text-on-surface-variant hover:opacity-80 transition-opacity p-2 bg-surface-container-low rounded-full">arrow_back</button>
+        <div class="text-2xl font-black text-primary italic font-headline">Catch My Love</div>
         <div class="w-10"></div>
       </header>
 
@@ -228,12 +262,16 @@ class Game {
   }
 
   renderSettings() {
+    const soundEnabled = this.settings.sound;
+    const hapticsEnabled = this.settings.haptics;
+    const darkEnabled = this.settings.darkMode;
+
     this.app.innerHTML = `
       <div class="fixed inset-0 z-0 vibrant-gradient-bg opacity-20"></div>
       
       <header class="flex justify-between items-center w-full px-6 py-4 absolute top-0 z-50">
-        <button id="back-btn" class="material-symbols-outlined text-[#5d5b58] hover:opacity-80 transition-opacity p-2 bg-surface-container-low rounded-full">arrow_back</button>
-        <div class="text-2xl font-black text-[#a8275a] italic font-headline">Catch My Love</div>
+        <button id="back-btn" class="material-symbols-outlined text-on-surface-variant hover:opacity-80 transition-opacity p-2 bg-surface-container-low rounded-full">arrow_back</button>
+        <div class="text-2xl font-black text-primary italic font-headline">Catch My Love</div>
         <div class="w-10"></div>
       </header>
 
@@ -245,7 +283,7 @@ class Game {
           </div>
 
           <div class="space-y-4">
-            <div class="bg-surface-container-lowest/80 backdrop-blur-xl p-4 rounded-xl flex items-center justify-between cursor-pointer hover:bg-surface-container-low transition-colors">
+            <div id="toggle-sound" class="bg-surface-container-lowest/80 backdrop-blur-xl p-4 rounded-xl flex items-center justify-between cursor-pointer hover:bg-surface-container-low transition-colors">
               <div class="flex items-center gap-4">
                 <span class="material-symbols-outlined text-secondary text-2xl">volume_up</span>
                 <div>
@@ -253,12 +291,12 @@ class Game {
                   <p class="font-label text-xs text-on-surface-variant">Game sounds and feedback</p>
                 </div>
               </div>
-              <div class="w-12 h-6 bg-primary-container rounded-full relative">
-                <div class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full shadow"></div>
+              <div class="w-12 h-6 ${soundEnabled ? 'bg-primary-container' : 'bg-surface-variant'} rounded-full relative transition-colors">
+                <div class="absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${soundEnabled ? 'right-1' : 'left-1'}"></div>
               </div>
             </div>
 
-            <div class="bg-surface-container-lowest/80 backdrop-blur-xl p-4 rounded-xl flex items-center justify-between cursor-pointer hover:bg-surface-container-low transition-colors">
+            <div id="toggle-haptics" class="bg-surface-container-lowest/80 backdrop-blur-xl p-4 rounded-xl flex items-center justify-between cursor-pointer hover:bg-surface-container-low transition-colors">
               <div class="flex items-center gap-4">
                 <span class="material-symbols-outlined text-secondary text-2xl">vibration</span>
                 <div>
@@ -266,8 +304,8 @@ class Game {
                   <p class="font-label text-xs text-on-surface-variant">Vibration feedback</p>
                 </div>
               </div>
-              <div class="w-12 h-6 bg-primary-container rounded-full relative">
-                <div class="absolute right-1 top-1 w-4 h-4 bg-white rounded-full shadow"></div>
+              <div class="w-12 h-6 ${hapticsEnabled ? 'bg-primary-container' : 'bg-surface-variant'} rounded-full relative transition-colors">
+                <div class="absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${hapticsEnabled ? 'right-1' : 'left-1'}"></div>
               </div>
             </div>
 
@@ -284,16 +322,16 @@ class Game {
               </div>
             </div>
 
-            <div class="bg-surface-container-lowest/80 backdrop-blur-xl p-4 rounded-xl flex items-center justify-between cursor-pointer hover:bg-surface-container-low transition-colors">
+            <div id="toggle-dark" class="bg-surface-container-lowest/80 backdrop-blur-xl p-4 rounded-xl flex items-center justify-between cursor-pointer hover:bg-surface-container-low transition-colors">
               <div class="flex items-center gap-4">
                 <span class="material-symbols-outlined text-secondary text-2xl">dark_mode</span>
                 <div>
                   <p class="font-headline font-bold text-on-surface">Dark Mode</p>
-                  <p class="font-label text-xs text-on-surface-variant">Coming soon</p>
+                  <p class="font-label text-xs text-on-surface-variant">Easier on eyes</p>
                 </div>
               </div>
-              <div class="px-3 py-1 bg-surface-variant rounded-full">
-                <span class="font-label text-xs text-on-surface-variant">Soon</span>
+              <div class="w-12 h-6 ${darkEnabled ? 'bg-primary-container' : 'bg-surface-variant'} rounded-full relative transition-colors">
+                <div class="absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${darkEnabled ? 'right-1' : 'left-1'}"></div>
               </div>
             </div>
           </div>
@@ -304,6 +342,25 @@ class Game {
     document.querySelector('#back-btn').addEventListener('click', () => {
       this.state.view = 'start';
       this.render();
+    });
+
+    document.querySelector('#toggle-sound')?.addEventListener('click', () => {
+      this.settings.sound = !this.settings.sound;
+      setSoundEnabled(this.settings.sound);
+      localStorage.setItem('sound', this.settings.sound);
+      this.renderSettings();
+    });
+
+    document.querySelector('#toggle-haptics')?.addEventListener('click', () => {
+      this.settings.haptics = !this.settings.haptics;
+      localStorage.setItem('haptics', this.settings.haptics);
+      this.renderSettings();
+    });
+
+    document.querySelector('#toggle-dark')?.addEventListener('click', () => {
+      this.settings.darkMode = !this.settings.darkMode;
+      this.toggleDarkMode(this.settings.darkMode);
+      this.renderSettings();
     });
   }
 

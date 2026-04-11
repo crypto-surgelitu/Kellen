@@ -4,6 +4,7 @@ import { GameOver } from './GameOver';
 import { HEART_TYPES, GAME_PHYSICS, AFFECTION_MESSAGES } from '../utils/constants';
 import { checkCollision } from '../utils/collision';
 import { triggerHaptic } from '../utils/haptics';
+import { playSound, setSoundEnabled } from '../utils/audio';
 
 export class GameBoard {
   constructor(container, gameState, onHome) {
@@ -284,9 +285,14 @@ export class GameBoard {
         if (heart.type.score > 0) {
           this.missCount++;
           this.combo = 1;
+          if (this.settings.sound) {
+            playSound('miss');
+          }
           if (this.missCount > 2) {
             this.state.lives--;
-            triggerHaptic('heavy');
+            if (this.settings.haptics) {
+              triggerHaptic('heavy');
+            }
             this.updateHUD();
           }
         }
@@ -319,9 +325,19 @@ export class GameBoard {
 
     if (heart.type.lives) {
       this.state.lives += heart.type.lives;
-      triggerHaptic(heart.type.lives < 0 ? 'heavy' : 'medium');
+      if (this.settings.haptics) {
+        triggerHaptic(heart.type.lives < 0 ? 'heavy' : 'medium');
+      }
+      playSound('heartbreak');
     } else {
-      triggerHaptic('light');
+      if (this.settings.haptics) {
+        triggerHaptic('light');
+      }
+      if (heart.type.type === 'GOLDEN') {
+        playSound('golden');
+      } else {
+        playSound('catch');
+      }
     }
 
     this.combo = Math.min(this.combo + 1, 10);
@@ -330,6 +346,9 @@ export class GameBoard {
     this.state.level = Math.floor(this.state.score / 100) + 1;
     if (this.state.level > previousLevel) {
       this.triggerLevelUpFlash();
+      if (this.settings.sound) {
+        playSound('levelup');
+      }
     }
 
     if (this.combo === 10 && !this.showPopup) {
@@ -360,6 +379,7 @@ export class GameBoard {
   setupSettingsListeners() {
     document.querySelector('#toggle-sound')?.addEventListener('click', () => {
       this.settings.sound = !this.settings.sound;
+      setSoundEnabled(this.settings.sound);
       this.render();
       this.setupSettingsListeners();
     });
@@ -434,6 +454,9 @@ export class GameBoard {
 
   gameOver() {
     this.isPaused = true;
+    if (this.settings.sound) {
+      playSound('gameover');
+    }
     new GameOver(
       this.container,
       this.state.score,
