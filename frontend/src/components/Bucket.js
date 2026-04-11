@@ -32,6 +32,13 @@ export class Bucket {
     return 40;
   }
 
+  updatePosition() {
+    if (this.el) {
+      this.el.style.left = `${this.x}px`;
+      this.el.style.top = `${this.y}px`;
+    }
+  }
+
   create() {
     this.el = document.createElement('div');
     this.el.id = 'bucket';
