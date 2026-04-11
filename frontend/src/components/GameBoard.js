@@ -236,47 +236,30 @@ export class GameBoard {
   setupInput() {
     if (this.inputSetupDone) return;
 
-    let lastTouchY = 0;
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let isMovingVertical = false;
-    let verticalThreshold = 15;
+    let initialTouch = null;
+    let touchMoved = false;
 
     const handleMove = (e) => {
       if (this.isPaused || !this.bucket) return;
 
+      e.preventDefault();
+      
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-      // Determine if vertical or horizontal movement
-      if (e.type === 'touchmove') {
-        if (!touchStartX || !touchStartY) {
-          touchStartX = clientX;
-          touchStartY = clientY;
-        }
-
-        const deltaX = Math.abs(clientX - touchStartX);
-        const deltaY = Math.abs(clientY - touchStartY);
-
-        // If moved more vertically, enable vertical movement
-        if (deltaY > verticalThreshold && deltaY > deltaX) {
-          isMovingVertical = true;
-        }
-        if (deltaX > verticalThreshold && deltaX > deltaY) {
-          isMovingVertical = false;
-        }
-
-        if (isMovingVertical) {
-          const delta = clientY - lastTouchY;
-          if (lastTouchY) {
-            this.bucket.moveVertical(-delta * 1.5);
-          }
-          lastTouchY = clientY;
+      if (e.type === 'touchmove' && initialTouch) {
+        touchMoved = true;
+        
+        const deltaX = clientX - initialTouch.x;
+        const deltaY = clientY - initialTouch.y;
+        
+        if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 10) {
+          const newY = Math.max(100, Math.min(window.innerHeight - this.bucket.height - 50, clientY - this.bucket.height / 2));
+          this.bucket.moveTo(this.bucket.x, newY);
         } else {
           this.bucket.moveTo(clientX - this.bucket.width / 2);
         }
-      } else {
-        // Mouse - horizontal only with alt key for vertical
+      } else if (e.type === 'mousemove') {
         if (e.altKey) {
           this.bucket.moveTo(this.bucket.x, clientY - this.bucket.height / 2);
         } else {
@@ -287,19 +270,16 @@ export class GameBoard {
 
     const handleTouchStart = (e) => {
       if (this.isPaused || !this.bucket) return;
+      e.preventDefault();
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      touchStartX = clientX;
-      touchStartY = clientY;
-      lastTouchY = clientY;
-      isMovingVertical = false;
+      initialTouch = { x: clientX, y: clientY };
+      touchMoved = false;
     };
 
     const handleTouchEnd = () => {
-      touchStartX = 0;
-      touchStartY = 0;
-      lastTouchY = 0;
-      isMovingVertical = false;
+      initialTouch = null;
+      touchMoved = false;
     };
 
     window.addEventListener('mousemove', handleMove);
