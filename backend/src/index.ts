@@ -1,7 +1,21 @@
 import app from './app';
 import { config } from './config';
 
-const PORT = config.port;
+// Import routes - ensure they're loaded
+import './routes/config';
+import './routes/messages';
+import './routes/scores';
+import './routes/auth';
+import './routes/rewards';
+import './routes/users';
 
-// Export for Vercel serverless
+// Vercel serverless handler
 export default app;
+
+// Local dev server
+const PORT = config.port;
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`[SERVER] Catch My Love API running on port ${PORT}`);
+  });
+}
