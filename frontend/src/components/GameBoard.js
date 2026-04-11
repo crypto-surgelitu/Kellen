@@ -236,56 +236,16 @@ export class GameBoard {
   setupInput() {
     if (this.inputSetupDone) return;
 
-    let initialTouch = null;
-    let touchMoved = false;
-
     const handleMove = (e) => {
       if (this.isPaused || !this.bucket) return;
-
-      e.preventDefault();
-      
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-      if (e.type === 'touchmove' && initialTouch) {
-        touchMoved = true;
-        
-        const deltaX = clientX - initialTouch.x;
-        const deltaY = clientY - initialTouch.y;
-        
-        if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 10) {
-          const newY = Math.max(100, Math.min(window.innerHeight - this.bucket.height - 50, clientY - this.bucket.height / 2));
-          this.bucket.moveTo(this.bucket.x, newY);
-        } else {
-          this.bucket.moveTo(clientX - this.bucket.width / 2);
-        }
-      } else if (e.type === 'mousemove') {
-        if (e.altKey) {
-          this.bucket.moveTo(this.bucket.x, clientY - this.bucket.height / 2);
-        } else {
-          this.bucket.moveTo(clientX - this.bucket.width / 2);
-        }
-      }
-    };
-
-    const handleTouchStart = (e) => {
-      if (this.isPaused || !this.bucket) return;
       e.preventDefault();
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      initialTouch = { x: clientX, y: clientY };
-      touchMoved = false;
-    };
-
-    const handleTouchEnd = () => {
-      initialTouch = null;
-      touchMoved = false;
+      this.bucket.moveTo(clientX - this.bucket.width / 2);
     };
 
     window.addEventListener('mousemove', handleMove);
     window.addEventListener('touchmove', handleMove, { passive: false });
-    window.addEventListener('touchstart', handleTouchStart, { passive: false });
-    window.addEventListener('touchend', handleTouchEnd);
+    window.addEventListener('touchstart', handleMove, { passive: false });
     this.inputSetupDone = true;
   }
 
