@@ -86,7 +86,7 @@ export class GameOver {
 
           <!-- Buttons -->
           <div class="flex flex-col w-full gap-3 sm:gap-4">
-<button id="retry-btn" class="w-full py-3 sm:py-4 px-8 rounded-full bg-gradient-to-r from-primary to-primary-container text-white font-headline font-bold text-base sm:text-lg shadow-[0_8px_20px_rgba(168,39,90,0.3)] hover:scale-105 active:scale-95 transition-all duration-400 flex items-center justify-center gap-2">
+<button id="retry-btn" class="w-full py-3 sm:py-4 px-8 rounded-full text-white font-headline font-bold text-base sm:text-lg shadow-[0_8px_20px_rgba(168,39,90,0.3)] hover:scale-105 active:scale-95 transition-all duration-400 flex items-center justify-center gap-2" style="background: linear-gradient(135deg, #A82760 0%, #E8427A 100%);">
           <span class="material-symbols-outlined text-xl">replay</span>
           Retry
         </button>

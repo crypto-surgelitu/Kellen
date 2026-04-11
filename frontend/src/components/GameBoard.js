@@ -20,6 +20,7 @@ export class GameBoard {
     this.combo = 1;
     this.showPopup = false;
     this.showSettings = false;
+    this.popupShownForStreak10 = false;
     this.settings = {
       sound: true,
       haptics: true,
@@ -157,7 +158,7 @@ export class GameBoard {
             You just hit a 10-heart streak! Your rhythm is perfectly in sync with the beats. Keep going!
           </p>
           <div class="flex flex-col w-full gap-3">
-            <button id="continue-btn" class="w-full py-4 px-8 bg-gradient-to-r from-primary to-primary-container text-white font-bold rounded-xl shadow-lg hover:opacity-90 active:scale-95 transition-all duration-400 ease-[cubic-bezier(0.34,1.56,0.64,1)]">
+            <button id="continue-btn" class="w-full py-4 px-8 bg-gradient-to-r from-[#A82760] to-[#E8427A] text-white font-bold rounded-xl shadow-lg hover:opacity-90 active:scale-95 transition-all duration-400 ease-[cubic-bezier(0.34,1.56,0.64,1)]" style="background: linear-gradient(135deg, #A82760 0%, #E8427A 100%);">
               Continue Playing
             </button>
             <button id="stats-btn" class="w-full py-3 px-8 text-primary font-medium hover:bg-surface-container-low rounded-xl transition-colors">
@@ -235,15 +236,76 @@ export class GameBoard {
   setupInput() {
     if (this.inputSetupDone) return;
 
+    let lastTouchY = 0;
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let isMovingVertical = false;
+    let verticalThreshold = 15;
+
     const handleMove = (e) => {
       if (this.isPaused || !this.bucket) return;
 
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      this.bucket.moveTo(clientX - this.bucket.width / 2);
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+      // Determine if vertical or horizontal movement
+      if (e.type === 'touchmove') {
+        if (!touchStartX || !touchStartY) {
+          touchStartX = clientX;
+          touchStartY = clientY;
+        }
+
+        const deltaX = Math.abs(clientX - touchStartX);
+        const deltaY = Math.abs(clientY - touchStartY);
+
+        // If moved more vertically, enable vertical movement
+        if (deltaY > verticalThreshold && deltaY > deltaX) {
+          isMovingVertical = true;
+        }
+        if (deltaX > verticalThreshold && deltaX > deltaY) {
+          isMovingVertical = false;
+        }
+
+        if (isMovingVertical) {
+          const delta = clientY - lastTouchY;
+          if (lastTouchY) {
+            this.bucket.moveVertical(-delta * 1.5);
+          }
+          lastTouchY = clientY;
+        } else {
+          this.bucket.moveTo(clientX - this.bucket.width / 2);
+        }
+      } else {
+        // Mouse - horizontal only with alt key for vertical
+        if (e.altKey) {
+          this.bucket.moveTo(this.bucket.x, clientY - this.bucket.height / 2);
+        } else {
+          this.bucket.moveTo(clientX - this.bucket.width / 2);
+        }
+      }
+    };
+
+    const handleTouchStart = (e) => {
+      if (this.isPaused || !this.bucket) return;
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      touchStartX = clientX;
+      touchStartY = clientY;
+      lastTouchY = clientY;
+      isMovingVertical = false;
+    };
+
+    const handleTouchEnd = () => {
+      touchStartX = 0;
+      touchStartY = 0;
+      lastTouchY = 0;
+      isMovingVertical = false;
     };
 
     window.addEventListener('mousemove', handleMove);
     window.addEventListener('touchmove', handleMove, { passive: false });
+    window.addEventListener('touchstart', handleTouchStart, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd);
     this.inputSetupDone = true;
   }
 
@@ -351,7 +413,9 @@ export class GameBoard {
       }
     }
 
-    if (this.combo === 10 && !this.showPopup) {
+    // Show popup ONLY once per 10-streak and reset combo tracking
+    if (this.combo === 10 && !this.popupShownForStreak10) {
+      this.popupShownForStreak10 = true;
       this.showPopup = true;
       this.isPaused = true;
       this.render();
@@ -482,5 +546,6 @@ export class GameBoard {
     this.combo = 1;
     this.showPopup = false;
     this.showSettings = false;
+    this.popupShownForStreak10 = false;
   }
 }
